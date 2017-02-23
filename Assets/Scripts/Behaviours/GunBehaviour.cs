@@ -1,14 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GunBehaviour : MonoBehaviour {
-
+public interface IWielder
+{
+    Vector3 returnAimPosition();
+}
+public interface IWieldable
+{
+    void SetWielder(IWielder wielderB);
+}
+public class GunBehaviour : MonoBehaviour,IWieldable {
+    // Note to self: There is a soft coupling between EnemyAimBehaviour and GunBehaviour
     public Transform wielder;
     public Transform FiringPoint;
     private Transform gun;
     private Vector3 aimPosition;
     private float angle;
     private Camera cam;
+    public IWielder wielderBehaviour;
 
     private bool isAimingRight;
 
@@ -29,6 +38,10 @@ public class GunBehaviour : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
+    public void SetWielder(IWielder wielderB)
+    {
+        wielderBehaviour = wielderB;
+    }
 	void Update () {
         if (!wielder && cam)
         {
@@ -36,7 +49,16 @@ public class GunBehaviour : MonoBehaviour {
         }
 
         // Get the aim direction and normalise the vector
-        aimPosition = Input.mousePosition;
+        if (wielderBehaviour == null)
+        {
+            aimPosition = Input.mousePosition; // Need to encapsulate this...
+        }
+        else
+        {
+            // If there is a wielder behaviour attached, get that instead.
+            aimPosition = cam.WorldToScreenPoint(wielderBehaviour.returnAimPosition());
+        }
+
         Vector3 wielderScreenPos = cam.WorldToScreenPoint(wielder.position);
         float xDiff = aimPosition.x - wielderScreenPos.x;
         float yDiff = aimPosition.y - wielderScreenPos.y;

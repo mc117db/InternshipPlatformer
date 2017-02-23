@@ -11,6 +11,7 @@ public class ComponentBullet : MonoBehaviour ,IRecyle
     private Vector3 direction; // This should be a normalised vector
     private float m_speed = 1;
     private Rigidbody m_rigidbody;
+    public GameObject gunshotSound;
 
     public void SetBulletValue(Vector3 dir)
     {
@@ -62,6 +63,7 @@ public class ComponentBullet : MonoBehaviour ,IRecyle
             //Cache the rigidbody
             m_rigidbody = gameObject.GetComponent<Rigidbody>();
         }
+        GameObjectUtil.Instantiate(gunshotSound, transform.position);
     }
 
     public void Shutdown()

@@ -1,15 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ComponentGun : MonoBehaviour {
+public interface IFirable
+{
+    void Fire();
+}
+public class ComponentGun : MonoBehaviour, IFirable{
 
     public Transform FiringPoint;
     public GameObject bulletprefab;
-    public AudioSource gunShotSource;
     public float bulletSpeed = 10;
     public int bulletDamage = 1;
     public float rateOfFire = 0.5f;
     bool canFire = true;
+    [SerializeField]
+    bool isEnemy = false; //This is quite bad, some refactoring is necessary
     float timeToNextFire;
 
 	// Use this for initialization
@@ -24,31 +29,30 @@ public class ComponentGun : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	    if (Input.GetMouseButton(0))
+        if (!isEnemy)
         {
-            if (canFire)
+            if (Input.GetMouseButton(0))
             {
-                Fire();
-                timeToNextFire = rateOfFire;
-                canFire = false;
+                if (canFire)
+                {
+                    Fire();
+                    timeToNextFire = rateOfFire;
+                    canFire = false;
+                }
             }
-        }
-        if (!canFire)
-        {
-            timeToNextFire -= Time.deltaTime;
-            if (timeToNextFire <= 0)
+            if (!canFire)
             {
-                canFire = true;
+                timeToNextFire -= Time.deltaTime;
+                if (timeToNextFire <= 0)
+                {
+                    canFire = true;
+                }
             }
         }
     }
 
-    void Fire()
+    public void Fire()
     {
-        if (gunShotSource)
-        {
-            gunShotSource.Play();
-        }
         var bullet = GameObjectUtil.Instantiate(bulletprefab, FiringPoint.position);
         var bulletComponent = bullet.GetComponent<ComponentBullet>();
         bulletComponent.SetBulletValue(FiringPoint.right, bulletSpeed, bulletDamage);

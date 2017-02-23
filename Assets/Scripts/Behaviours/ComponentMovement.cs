@@ -61,6 +61,7 @@ public class ComponentMovement : MonoBehaviour
             // Jump when player is grounded!
             if (Input.GetButtonDown("Jump") && m_grounded)
             {
+                m_rigidbody.velocity = new Vector3(m_rigidbody.velocity.x, 0, 0);
                 m_rigidbody.AddForce(new Vector3(0, m_jumpHeight, 0),ForceMode.VelocityChange);
             }
 
