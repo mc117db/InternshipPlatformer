@@ -3,8 +3,9 @@ using System.Collections;
 
 public class ComponentGun : MonoBehaviour {
 
-    Transform FiringPoint;
+    public Transform FiringPoint;
     public GameObject bulletprefab;
+    public AudioSource gunShotSource;
     public float bulletSpeed = 10;
     public int bulletDamage = 1;
     public float rateOfFire = 0.5f;
@@ -14,17 +15,10 @@ public class ComponentGun : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         if (!FiringPoint)
-        {
-            if (transform.Find("FiringPoint") != null)
-            {
-                FiringPoint = transform.Find("FiringPoint");
-            }
-            else
-            {
+        {        
                 Debug.Log(gameObject.name + " is lacking a FiringPoint empty gameobject to reference from!");
                 // Tips for making a good firing point, align the X axis (RED ARROW), towards the direction you want to face in your gun.
                 // FiringPoint must be an empty gameobject
-            }
         }
 	}
 	
@@ -51,6 +45,10 @@ public class ComponentGun : MonoBehaviour {
 
     void Fire()
     {
+        if (gunShotSource)
+        {
+            gunShotSource.Play();
+        }
         var bullet = GameObjectUtil.Instantiate(bulletprefab, FiringPoint.position);
         var bulletComponent = bullet.GetComponent<ComponentBullet>();
         bulletComponent.SetBulletValue(FiringPoint.right, bulletSpeed, bulletDamage);

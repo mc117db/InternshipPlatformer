@@ -4,6 +4,7 @@ using System.Collections;
 public class GunBehaviour : MonoBehaviour {
 
     public Transform wielder;
+    public Transform FiringPoint;
     private Transform gun;
     private Vector3 aimPosition;
     private float angle;
@@ -15,6 +16,16 @@ public class GunBehaviour : MonoBehaviour {
     void Start () {
         cam = GameObject.Find("Main Camera").GetComponent<Camera>();
         gun = transform.GetChild(0);
+        // Try to find missing references
+        if (FiringPoint == null)
+        {
+            transform.Find("FiringPoint");
+        }
+        if (wielder == null)
+        {
+            wielder = transform.parent;
+            wielder.transform.localPosition = Vector3.zero;
+        }
 	}
 	
 	// Update is called once per frame
@@ -44,6 +55,7 @@ public class GunBehaviour : MonoBehaviour {
                 isAimingRight = false;
                 gun.localScale = new Vector3(1, 1, 1);
                 gun.localRotation = new Quaternion(0, 0, 0, 1);
+                FiringPoint.transform.localEulerAngles = new Vector3(0,0,0);
             }
         }
 
@@ -54,6 +66,7 @@ public class GunBehaviour : MonoBehaviour {
                 isAimingRight = true;
                 gun.localScale = new Vector3(-1, 1, 1);
                 gun.localRotation = new Quaternion(0, 0, 1, 0);
+                FiringPoint.transform.localEulerAngles = new Vector3(0, 0, 180);
             }
        
         }
