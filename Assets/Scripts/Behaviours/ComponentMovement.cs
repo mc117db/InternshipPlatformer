@@ -34,14 +34,13 @@ public class ComponentMovement : MonoBehaviour
 	void Update()
     {
         // Check whether the player is grounded to the floor
-        // TODO A sphere cast might be necessary to account for convex foot shape of the player.
-        m_grounded = Physics.Raycast(transform.position, -Vector3.up, m_distToGround+0.5f);
-        /*
-        Ray groundCheckRay = new Ray();
-        groundCheckRay.direction = Vector3.down;
-        groundCheckRay.origin = transform.position - new Vector3(0,m_distToGround+capsuleCol.radius,0);
-        m_grounded = Physics.SphereCast(groundCheckRay, capsuleCol.radius);
-        */
+        m_grounded = (
+                      (Physics.Raycast(transform.position, -Vector3.up, m_distToGround + 0.2f) ||
+                      Physics.Raycast(transform.position + new Vector3(capsuleCol.radius, 0, 0), Vector3.down, m_distToGround + 0.2f) ||
+                      Physics.Raycast(transform.position - new Vector3(capsuleCol.radius, 0, 0), Vector3.down, m_distToGround + 0.2f))
+                      &&
+                      m_rigidbody.velocity.y < 0.1f
+                      );
     }
 	// Update is called once per frame
 	void FixedUpdate () 
@@ -59,7 +58,7 @@ public class ComponentMovement : MonoBehaviour
             m_rigidbody.AddForce(new Vector3(!m_wallcolliding?(m_grounded ? moveX : moveX * AirControlDegree):0, 0, 0), ForceMode.Impulse);
 
             // Jump when player is grounded!
-            if (Input.GetButtonDown("Jump") && m_grounded)
+            if (Input.GetButton("Jump") && m_grounded)
             {
                 m_rigidbody.velocity = new Vector3(m_rigidbody.velocity.x, 0, 0);
                 m_rigidbody.AddForce(new Vector3(0, m_jumpHeight, 0),ForceMode.VelocityChange);

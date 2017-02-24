@@ -49,7 +49,10 @@ public class ComponentMovingPlatform : MonoBehaviour
     {
         // Add the GameObject collided with to the list.
         // 8 is reserved for bullets
-        if (col.gameObject.layer != 8)
+        // Dot expression checks whether the angle of contact between the colliders is upwards to world space
+        // Value of 1 means they are the same direction, -1 opp direction, 0 is perpendicular
+
+        if (col.gameObject.layer != 8 && Vector3.Dot(Vector3.down, col.contacts[0].normal) > 0.3f)
         {
             contacts.Add(col.gameObject.GetComponent<Rigidbody>());
         }
