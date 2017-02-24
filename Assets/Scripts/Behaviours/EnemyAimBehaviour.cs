@@ -3,7 +3,6 @@ using System.Collections;
 using System;
 
 public class EnemyAimBehaviour : MonoBehaviour, IWielder {
-    // Note to self: There is a soft coupling between EnemyAimBehaviour and GunBehaviour
     public IFirable weaponComponent; // Call Fire() to fire the equipped weapon
     public GameObject weapon; // Weapon should have a gun component (in this context) but as long as the component
                               // implements IFirable then its up for use.
@@ -13,8 +12,10 @@ public class EnemyAimBehaviour : MonoBehaviour, IWielder {
     public int shootAmountPerInterval = 3;
     public float waitTimeBetweenShots = 0.5f;
     public float waitTimeBetweenIntervals = 3f;
+    private float lineOfSightUpdateRate = 0.2f; // We dont need to do a LoS check every frame do we?
 
     private bool canFire = true;
+    private bool canSeeTarget = false;
 
 
     public Vector3 returnAimPosition()
@@ -31,34 +32,35 @@ public class EnemyAimBehaviour : MonoBehaviour, IWielder {
         }
     }
 
-    /*
-    public bool isTargetInLineOfSight(Transform iTarget)
-    {
-        // Do a raycast towards the target's direction, if hit the target return true
-        RaycastHit[] hit = new RaycastHit[0];
-        Ray d_ray = new Ray();
-        d_ray.direction = iTarget.position - transform.position;
-        d_ray.origin = transform.position;
 
-        if (Physics.Raycast(d_ray,hit))
+    void isTargetInLineOfSight()
+    {
+        RaycastHit hit;
+        if (Physics.Linecast(transform.position, target.position, out hit))
         {
-            if (hit.transform == iTarget)
+            if (hit.collider.gameObject.transform == target)
             {
-                // enemy can see the player!
+                canSeeTarget = true;
             }
             else
             {
-                // there is something obstructing the view
+                canSeeTarget = false;
             }
         }
+
     }
-    */
+  
 
     // Use this for initialization
     void Start () {
         if (!target)
         {
             target = GameObject.Find("Player").transform;
+        }
+        else
+        {
+            // Start Line of Sight check
+            InvokeRepeating("isTargetInLineOfSight", 0, lineOfSightUpdateRate);
         }
         if (!weapon)
         {
@@ -95,7 +97,7 @@ public class EnemyAimBehaviour : MonoBehaviour, IWielder {
 	
 	// Update is called once per frame
 	void Update () {
-	    if (canFire)
+	    if (canFire && canSeeTarget)
         {
             StartCoroutine(ExecuteShootInterval());   
         }
