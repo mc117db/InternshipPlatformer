@@ -14,7 +14,8 @@ public class ComponentGun : MonoBehaviour, IFirable{
     public float rateOfFire = 0.5f;
     bool canFire = true;
     [SerializeField]
-    bool isEnemy = false; //This is quite bad, some refactoring is necessary
+    bool isEnemy = false; //If true, it will use mouse button to fire else it will only fire when an external component
+                          //Calls upon it, say.. EnemyAimBehaviour
     float timeToNextFire;
 
 	// Use this for initialization

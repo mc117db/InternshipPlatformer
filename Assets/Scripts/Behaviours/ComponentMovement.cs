@@ -71,6 +71,8 @@ public class ComponentMovement : MonoBehaviour
                 m_rigidbody.velocity = new Vector3(Mathf.Sign(m_rigidbody.velocity.x) * Speed, m_rigidbody.velocity.y, 0);
             }
 
+            /*----------------------------------- Collision Checks -----------------------------------------------*/
+
             // Cast a "capsule" onto the horizontal direction the player is moving towards, if it hits something. Set the horizontal velocity to zero
             // We need to do this to prevent player from getting stuck on the wall when he is pressing movement keys against it.
             if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0)

@@ -4,11 +4,18 @@ using System;
 
 public class EnemyAimBehaviour : MonoBehaviour, IWielder {
     // Note to self: There is a soft coupling between EnemyAimBehaviour and GunBehaviour
-    public IFirable weaponComponent;
+    public IFirable weaponComponent; // Call Fire() to fire the equipped weapon
     public GameObject weapon; // Weapon should have a gun component (in this context) but as long as the component
                               // implements IFirable then its up for use.
     public GameObject aimController;
     public Transform target;
+    [Space(10)]
+    public int shootAmountPerInterval = 3;
+    public float waitTimeBetweenShots = 0.5f;
+    public float waitTimeBetweenIntervals = 3f;
+
+    private bool canFire = true;
+
 
     public Vector3 returnAimPosition()
     {
@@ -23,6 +30,29 @@ public class EnemyAimBehaviour : MonoBehaviour, IWielder {
             return target.position - new Vector3(0,0.5f,0);
         }
     }
+
+    /*
+    public bool isTargetInLineOfSight(Transform iTarget)
+    {
+        // Do a raycast towards the target's direction, if hit the target return true
+        RaycastHit[] hit = new RaycastHit[0];
+        Ray d_ray = new Ray();
+        d_ray.direction = iTarget.position - transform.position;
+        d_ray.origin = transform.position;
+
+        if (Physics.Raycast(d_ray,hit))
+        {
+            if (hit.transform == iTarget)
+            {
+                // enemy can see the player!
+            }
+            else
+            {
+                // there is something obstructing the view
+            }
+        }
+    }
+    */
 
     // Use this for initialization
     void Start () {
@@ -48,7 +78,7 @@ public class EnemyAimBehaviour : MonoBehaviour, IWielder {
             {
                 // Return back the weapon component
                 weaponComponent = (IFirable)component;
-                Debug.Log("Found component");
+                //.Log("Found component");
             }
         }
 
@@ -65,6 +95,32 @@ public class EnemyAimBehaviour : MonoBehaviour, IWielder {
 	
 	// Update is called once per frame
 	void Update () {
-	
+	    if (canFire)
+        {
+            StartCoroutine(ExecuteShootInterval());   
+        }
 	}
+    IEnumerator ExecuteShootInterval()
+    {
+        canFire = false;
+        for (int i = 0; i < shootAmountPerInterval; i++)
+        {
+            //Debug.Log("BANG!");
+            Shoot();
+            yield return new WaitForSeconds(waitTimeBetweenShots);
+        }
+        StartCoroutine(CooldownBetweenInterval());
+    }
+    IEnumerator CooldownBetweenInterval()
+    {
+        yield return new WaitForSeconds(waitTimeBetweenIntervals);
+        canFire = true;
+    }
+    void Shoot()
+    {
+        if(weaponComponent != null)
+        {
+            weaponComponent.Fire();
+        }
+    }
 }

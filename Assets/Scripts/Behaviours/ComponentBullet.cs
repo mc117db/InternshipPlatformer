@@ -46,13 +46,9 @@ public class ComponentBullet : MonoBehaviour ,IRecyle
             a = col.gameObject.GetComponent<ComponentHealth>();
             a.Damage(m_dmg);
         }
-		DestroyGameObject();
-	}
-	
-	public void DestroyGameObject()
-	{
         GameObjectUtil.Destroy(gameObject);
 	}
+	
 
     // GameObject Pooling functions
     public void Restart()
