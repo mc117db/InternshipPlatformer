@@ -11,7 +11,7 @@ public class ComponentMovingPlatform : MonoBehaviour
     private Vector3 travelDirection;      //direction of travel
     public float TravelDistance;    //how far to move before reverse
     Vector3 StartPos;
-    private List<Rigidbody> contacts = new List<Rigidbody>();
+    private Rigidbody m_rigidbody;
 
     public void Start()
     {
@@ -28,61 +28,21 @@ public class ComponentMovingPlatform : MonoBehaviour
             travelDirection = Vector3.right;
         }
         StartPos = transform.position;
+        m_rigidbody = GetComponent<Rigidbody>();
     }
-  
-    public void Update()
-    {
-        if (transform.position.x > StartPos.x + TravelDistance)
-        {
-            travelDirection = -travelDirection;
-        }
-
-        else if (transform.position.x < StartPos.x)
-        {
-            travelDirection = -travelDirection;
-        }
-
-        transform.Translate(travelDirection * movespeed * Time.deltaTime);
-    }
-
-    void OnCollisionEnter(Collision col)
-    {
-        // Add the GameObject collided with to the list.
-        // 8 is reserved for bullets
-        // Dot expression checks whether the angle of contact between the colliders is upwards to world space
-        // Value of 1 means they are the same direction, -1 opp direction, 0 is perpendicular
-
-        if (col.gameObject.layer != 8 && Vector3.Dot(Vector3.down, col.contacts[0].normal) > 0.3f)
-        {
-            contacts.Add(col.gameObject.GetComponent<Rigidbody>());
-        }
-    }
-
-    void OnCollisionExit(Collision col)
-    {
-        // Remove the GameObject collided with from the list.
-        contacts.Remove(col.gameObject.GetComponent<Rigidbody>());
-    }
-
+    
     public void FixedUpdate()
     {
-        if (contacts.Count > 0)
+        if (transform.position.x > StartPos.x + TravelDistance || transform.position.x < StartPos.x)
         {
-
-            foreach (Rigidbody contact in contacts)
-            {
-                //contact.AddForce(travelDirection * movespeed,ForceMode.Impulse);
-                //
-                if (contact != null)
-                {
-                    contact.MovePosition(contact.position + travelDirection * movespeed * Time.deltaTime);
-                }
-                else
-                {
-                    contacts.Remove(contact);
-                }
-                
-            }
+            // Invert the direction vector
+            travelDirection = -travelDirection;
         }
+
+        if (m_rigidbody)
+        {
+        m_rigidbody.MovePosition(transform.position + travelDirection * movespeed * Time.deltaTime);
+        }
+     
     }
 }
