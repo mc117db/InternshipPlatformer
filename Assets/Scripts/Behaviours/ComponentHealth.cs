@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
-public class ComponentHealth : MonoBehaviour
+public class ComponentHealth : MonoBehaviour,IRecyle
 {
 	[SerializeField]
 	protected int m_MaxHP = 10;
@@ -18,21 +19,31 @@ public class ComponentHealth : MonoBehaviour
 	public float FractionHP {
         get { return (float)(m_CurrHP)/(float)(m_MaxHP); }
     }
-	
-	void Start()
+    public void Restart()
+    {
+        m_CurrHP = m_MaxHP;
+        Modify(0);
+    }
+
+    public void Shutdown()
+    {
+        // NO OP
+    }
+
+    void Start()
 	{
-		m_CurrHP = m_MaxHP;
+        Restart();
 	}
 
 	public void Damage(int amount)
     {
-        Debug.Log(gameObject.name + " took " + amount + " damage");
+        //Debug.Log(gameObject.name + " took " + amount + " damage");
         Modify(-amount);
     }
 
     public void Heal(int amount)
     {
-        Debug.Log(gameObject.name + " restored " + amount + " health");
+        //Debug.Log(gameObject.name + " restored " + amount + " health");
         Modify(amount);
     }
 
@@ -50,14 +61,22 @@ public class ComponentHealth : MonoBehaviour
 		}
 	}
 	
-	public void Set(int amount)
+	private void Set(int amount)
 	{
 		m_CurrHP = amount;
 		Modify (0); // run thru the checks in Modify()
 	}
+
+    public void HealToMax()
+    {
+        Set(MaxHP);
+    }
 		
 	public void Die()
 	{
-		Destroy(this.gameObject);
+        GameObjectUtil.Destroy(gameObject);
+		//Destroy(this.gameObject);
 	}
+
+    
 }
